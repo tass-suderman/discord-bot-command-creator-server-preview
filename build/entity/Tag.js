@@ -27,7 +27,6 @@ var Tag = /** @class */ (function () {
         (0, typeorm_1.PrimaryColumn)({ type: 'varchar', length: TAG_NAME_MAX }),
         (0, class_validator_1.IsAlphanumeric)(),
         (0, class_validator_1.Length)(TAG_NAME_MIN, TAG_NAME_MAX, { message: TAG_NAME_ERR }),
-        (0, class_validator_1.IsOptional)(),
         __metadata("design:type", String)
     ], Tag.prototype, "tagName", void 0);
     __decorate([

@@ -1,7 +1,3 @@
-/**
- * @author Tass Suderman, Levi Krozser
- * @purpose Registered user entity for CWEB280FinalProject
- */
 import { Entity, Column, Unique, PrimaryColumn, OneToMany } from 'typeorm'
 import { IsOptional, Length } from 'class-validator'
 import { Meme } from './Meme'

@@ -12,7 +12,7 @@ var RegisteredUser_1 = require("./entity/RegisteredUser");
 var Tag_1 = require("./entity/Tag");
 exports.AppDataSource = new typeorm_1.DataSource({
     type: 'better-sqlite3',
-    database: 'sqlite.db',
+    database: 'meme-world.db',
     synchronize: true,
     logging: false,
     entities: [Meme_1.Meme, Command_1.Command, RegisteredUser_1.RegisteredUser, Tag_1.Tag],

@@ -50,51 +50,16 @@ var AController_1 = require("./controller/AController");
 var routing_controllers_1 = require("routing-controllers");
 // Backend server port
 var port = 3030;
-var NOT_LOGGED_IN_ERR = 'You must be logged in to a discord session to perform this action';
-// todo maybe ? https://github.com/typestack/routing-controllers#using-authorization-features
 var ROUTE_NOT_FOUND_ERR = 'Route not found';
 var ROUTE_NOT_FOUND = { code: AController_1.AController.STATUS_CODES.ITEM_NOT_FOUND.code, message: ROUTE_NOT_FOUND_ERR };
 // CORS options
+// TODO assess CORS origin URL
 var corsOptions = {
     origin: /localhost:\d{4,5}$/i,
     credentials: true,
     allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization',
     methods: 'GET,PUT,POST,DELETE'
 };
-/**
- * This function is used as a handler for all incoming requests.
- * It passes the headers into our function used to fetch a user from discord via their bearer token
- * If that check returns correctly, their user info is appended to the request headers
- * If it fails, the request is turned away with an unauthorized status code and an error message
- * If it succeeds, we pass the request down to the next handler
- * @param req Client Request
- * @param res Server response
- * @param next Next function to be executed
- */
-var ACCOUNT_CHECKER = function (req, res, next) { return __awaiter(void 0, void 0, void 0, function () {
-    var userInfo, userFields;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, AController_1.AController.getUser(req.headers)];
-            case 1:
-                userInfo = _a.sent();
-                if (userInfo) {
-                    userFields = userInfo.split(AController_1.AController.DELIM);
-                    req.headers.uID = userFields[0];
-                    req.headers.userName = userFields[1];
-                    next();
-                }
-                else {
-                    res.statusCode = AController_1.AController.STATUS_CODES.UNAUTHORIZED_STATUS.code;
-                    return [2 /*return*/, res.json({
-                            code: AController_1.AController.STATUS_CODES.UNAUTHORIZED_STATUS.code,
-                            message: NOT_LOGGED_IN_ERR
-                        })];
-                }
-                return [2 /*return*/];
-        }
-    });
-}); };
 /**
  * This function is used as a handler for cases wherein another route is not used. This typically means the user has
  * entered an invalid URL. In this case, we first ensure headers have not been sent to the client. This acts as a second
@@ -120,8 +85,6 @@ data_source_1.AppDataSource.initialize().then(function () { return __awaiter(voi
         app = express();
         app.use(bodyParser.json());
         app.use(cors(corsOptions));
-        // first use the account checker
-        app.use(ACCOUNT_CHECKER);
         // then the controllers
         (0, routing_controllers_1.useExpressServer)(app, { controllers: controllers });
         // if the controllers do not fulfill your request, you receive a 404 for your efforts

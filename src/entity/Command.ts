@@ -1,7 +1,3 @@
-/**
- * @author Tass Suderman, Levi Krozser
- * @purpose Command entity for CWEB280FinalProject
- */
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm'
 import { IsInt, IsNotEmpty, IsOptional, Length, Max, Min } from 'class-validator'
 import { RegisteredUser } from './RegisteredUser'

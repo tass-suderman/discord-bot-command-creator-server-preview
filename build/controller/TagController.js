@@ -86,12 +86,6 @@ var TagController = /** @class */ (function (_super) {
         _this.tagRepo = data_source_1.AppDataSource.getRepository(Tag_1.Tag);
         return _this;
     }
-    /**
-     * GET route for /tags/
-     * Supports sortorder, sortfields, and where.
-     * Simply returns all tag objects
-     * @param req Server Request
-     */
     TagController.prototype.getTags = function (req) {
         return __awaiter(this, void 0, void 0, function () {
             var findOptions, sortField;
@@ -112,13 +106,6 @@ var TagController = /** @class */ (function (_super) {
             });
         });
     };
-    /**
-     * GET route for /tags/:tagName
-     * Returns the tagName instance, as well as all memes associated with that tag.
-     * For each meme, it will list its creator, and other tags associated with that meme
-     * @param tagName Tag name to search
-     * @param res Server response
-     */
     TagController.prototype.getOneTag = function (tagName, res) {
         return __awaiter(this, void 0, void 0, function () {
             var returnTag;

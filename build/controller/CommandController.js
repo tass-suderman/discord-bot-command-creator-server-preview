@@ -1,20 +1,4 @@
 "use strict";
-/**
-* @author Tass Suderman, Levi Krozser
- * Routes:
- * GET -- returns all commands
- *        -- supports sortorder, sortby, and where
- * GET One -- Returns one command based on commandID
- * POST -- Adds a command
- *         -- Requires cName, cText, memeID
- * PUT -- Updates a command
- *         -- Requires cName, cText, memeID
- *         -- Requires commandID in params
- *         -- Can only be changed by command creator
- * DELETE -- Deletes a command
- *         -- Requires commmandID in params
- *         -- Can only be performed by command creator
-*/
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
@@ -84,17 +68,11 @@ var routing_controllers_1 = require("routing-controllers");
 var AController_1 = require("./AController");
 var data_source_1 = require("../data-source");
 var Command_1 = require("../entity/Command");
-var class_validator_1 = require("class-validator");
 var Meme_1 = require("../entity/Meme");
-var RegisteredUser_1 = require("../entity/RegisteredUser");
-// Defines what would replace a self reference and other person reference
 var mentionSelfRef = '$self';
 var mentionHead = '$mention';
 var mentionTails = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'A', 'B', 'C', 'D', 'E', 'F'];
 var MISSING_ID_ERR = 'ID must be provided and numeric';
-var MISSING_MEMEID_ERR = 'Invalid body sent. Check your memeID';
-var EDIT_UNAUTHORIZED_ERR = 'Only the command creator can update their command';
-var DELETE_UNAUTHORIZED_ERR = 'Only the command creator can delete their command';
 var CommandController = /** @class */ (function (_super) {
     __extends(CommandController, _super);
     function CommandController() {
@@ -104,17 +82,6 @@ var CommandController = /** @class */ (function (_super) {
         _this.memeRepo = data_source_1.AppDataSource.getRepository(Meme_1.Meme);
         return _this;
     }
-    /**
-     * GET Route handler for /commands
-     * Returns commands, sorted or filtered, if requested.
-     * By default, it returns all commands, sorted in ascending order by ID
-     * Defining sortby can change the field it sorts by (see SORT_FIELDS for acceptable options)
-     * Declaring descending in sortorder can make it sort in descending order instead
-     * (See DESCENDING_OPTIONS in AController for more)
-     * Declaring where and adding any number of characters will filter to command results where they are LIKE the where value
-     * After the GET options are parsed, the results are returned in an array
-     * @param req Client Request
-     */
     CommandController.prototype.getCommands = function (req) {
         var _a;
         return __awaiter(this, void 0, void 0, function () {
@@ -141,16 +108,6 @@ var CommandController = /** @class */ (function (_super) {
             });
         });
     };
-    /**
-     * GET Route handler for /commands/:commandID
-     * Takes in a parameter, defining the requested command ID.
-     * If the CommandID is not a number or is otherwise not provided, it returns a 400 Bad request status
-     * It then searches for a command with that ID
-     * If it exists, it is returned as JSON.
-     * Else, a 404 is returned.
-     * @param commandID commandID to search for
-     * @param res Server Response
-     */
     CommandController.prototype.getOneCommand = function (commandID, res) {
         return __awaiter(this, void 0, void 0, function () {
             var returnCommand;
@@ -171,164 +128,41 @@ var CommandController = /** @class */ (function (_super) {
             });
         });
     };
-    /**
-     * POST handler for /commands/
-     * Used to create and save Command objects
-     * There are three paths that this code block can take
-     * 1) No meme ID Provided => Exit with bad request error code and message
-     * 2) Command provided fails validation => Exit with unprocessable entity and error messages
-     * 3) All goes as planned => Create and save command. Return it as JSON.
-     * @param req Client Request
-     * @param res Server Response
-     */
     CommandController.prototype.post = function (req, res) {
-        var _a;
         return __awaiter(this, void 0, void 0, function () {
-            var userFields, user, newCommand, violations;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        if (!((_a = req.body) === null || _a === void 0 ? void 0 : _a.memeID)) {
-                            return [2 /*return*/, this.exitWithMessage(res, AController_1.AController.STATUS_CODES.BAD_REQUEST, MISSING_MEMEID_ERR)];
-                        }
-                        userFields = {
-                            uID: req.headers.uID, userName: req.headers.userName
-                        };
-                        user = Object.assign(new RegisteredUser_1.RegisteredUser(), userFields);
-                        return [4 /*yield*/, this.commandBuilder(req, res, user)];
-                    case 1:
-                        newCommand = _b.sent();
-                        return [4 /*yield*/, (0, class_validator_1.validate)(newCommand)];
-                    case 2:
-                        violations = _b.sent();
-                        if (violations.length) {
-                            return [2 /*return*/, this.exitWithViolations(res, violations)];
-                        }
-                        return [4 /*yield*/, this.commandRepo.save(newCommand)];
-                    case 3: return [2 /*return*/, _b.sent()];
-                }
+            return __generator(this, function (_a) {
+                return [2 /*return*/, this.exitWithMessage(res, AController_1.AController.STATUS_CODES.NOT_IMPLEMENTED_ERROR, AController_1.AController.DEMO_CONTENT_LOCK)];
             });
         });
     };
-    /**
-     * PUT handler for /commands/:commandID
-     * Used to modify and update saved commands.
-     * The paths that the code can take
-     * 1) No command ID / Invalid command ID => Exit with status 400
-     * 2) Command ID doesn't point to an existing command => Exit with Error 404
-     * 3) Command Creator does not match logged in creator => Exit with Error 401
-     * 4) Command edits introduce validation errors => Exit with Error 422 and validation error messages
-     * 5) All is well => Command is saved and returned
-     * @param commandID ID of the command to be updated
-     * @param req Client request
-     * @param res Server response
-     */
     CommandController.prototype.update = function (commandID, req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var user, commandToUpdate, newCommand, violations;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!commandID) {
-                            return [2 /*return*/, this.exitWithMessage(res, AController_1.AController.STATUS_CODES.BAD_REQUEST, MISSING_ID_ERR)];
-                        }
-                        user = Object.assign(new RegisteredUser_1.RegisteredUser(), { uID: req.headers.uID, userName: req.headers.userName });
-                        return [4 /*yield*/, this.commandRepo.findOneBy({ commandID: commandID })];
-                    case 1:
-                        commandToUpdate = _a.sent();
-                        if (!commandToUpdate) {
-                            return [2 /*return*/, this.exitWithMessage(res, AController_1.AController.STATUS_CODES.ITEM_NOT_FOUND, "Command of ID ".concat(commandID, " is not found"))];
-                        }
-                        if (user.uID !== commandToUpdate.cCreator.uID) {
-                            return [2 /*return*/, this.exitWithMessage(res, AController_1.AController.STATUS_CODES.UNAUTHORIZED_STATUS, EDIT_UNAUTHORIZED_ERR)];
-                        }
-                        return [4 /*yield*/, this.commandBuilder(req, res, user)];
-                    case 2:
-                        newCommand = _a.sent();
-                        return [4 /*yield*/, (0, class_validator_1.validate)(newCommand)];
-                    case 3:
-                        violations = _a.sent();
-                        if (violations.length) {
-                            return [2 /*return*/, this.exitWithViolations(res, violations)];
-                        }
-                        newCommand.commandID = commandToUpdate.commandID;
-                        return [4 /*yield*/, this.commandRepo.save(newCommand)];
-                    case 4: return [2 /*return*/, _a.sent()];
-                }
+                return [2 /*return*/, this.exitWithMessage(res, AController_1.AController.STATUS_CODES.NOT_IMPLEMENTED_ERROR, AController_1.AController.DEMO_CONTENT_LOCK)];
             });
         });
     };
-    /**
-     * DELETE Route handler for /commands/:commandID
-     * Takes in request, response, and param
-     * Paths are as follows
-     * 1) Command ID invalid / not provided => Exit with Error 400
-     * 2) Command ID provided does not point to a valid command => Exit with Error 404
-     * 3) Logged-in user does not match the command creator => Exit with Error 401
-     * 4) All is well. Delete command and return results
-     * @param commandID ID of command to be deleted
-     * @param req Client Request
-     * @param res Server Response
-     */
     CommandController.prototype.delete = function (commandID, req, res) {
         return __awaiter(this, void 0, void 0, function () {
-            var user, commandToRemove;
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!commandID) {
-                            return [2 /*return*/, this.exitWithMessage(res, AController_1.AController.STATUS_CODES.BAD_REQUEST, MISSING_ID_ERR)];
-                        }
-                        user = Object.assign(new RegisteredUser_1.RegisteredUser(), { uID: req.headers.uID, userName: req.headers.userName });
-                        return [4 /*yield*/, this.commandRepo.findOneBy({ commandID: parseInt(req.params.commandID, 10) })]; // if things get broky look at this line
-                    case 1:
-                        commandToRemove = _a.sent() // if things get broky look at this line
-                        ;
-                        if (!commandToRemove) {
-                            return [2 /*return*/, this.exitWithMessage(res, AController_1.AController.STATUS_CODES.ITEM_NOT_FOUND, "Command of ID ".concat(commandID, " is not found"))];
-                        }
-                        if (user.uID !== commandToRemove.cCreator.uID) {
-                            return [2 /*return*/, this.exitWithMessage(res, AController_1.AController.STATUS_CODES.UNAUTHORIZED_STATUS, DELETE_UNAUTHORIZED_ERR)];
-                        }
-                        res.statusCode = AController_1.AController.STATUS_CODES.NO_CONTENT.code; // delete me if broky
-                        return [4 /*yield*/, this.commandRepo.remove(commandToRemove)];
-                    case 2: // delete me if broky
-                    return [2 /*return*/, _a.sent()];
-                }
+                return [2 /*return*/, this.exitWithMessage(res, AController_1.AController.STATUS_CODES.NOT_IMPLEMENTED_ERROR, AController_1.AController.DEMO_CONTENT_LOCK)];
             });
         });
     };
-    /**
-     * DELETE Route handler for /commands/
-     * Only used when ID is not provided.
-     * Returns error 400
-     * @param res Server Response
-     */
     CommandController.prototype.deleteNoID = function (res) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, this.exitWithMessage(res, AController_1.AController.STATUS_CODES.BAD_REQUEST, MISSING_ID_ERR)];
+                return [2 /*return*/, this.exitWithMessage(res, AController_1.AController.STATUS_CODES.NOT_IMPLEMENTED_ERROR, AController_1.AController.DEMO_CONTENT_LOCK)];
             });
         });
     };
-    /**
-     * PUT Route handler for /commands/
-     * Only used when ID is not provided.
-     * Returns error 400
-     * @param res Server Response
-     */
     CommandController.prototype.updateNoID = function (res) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2 /*return*/, this.exitWithMessage(res, AController_1.AController.STATUS_CODES.BAD_REQUEST, MISSING_ID_ERR)];
+                return [2 /*return*/, this.exitWithMessage(res, AController_1.AController.STATUS_CODES.NOT_IMPLEMENTED_ERROR, AController_1.AController.DEMO_CONTENT_LOCK)];
             });
         });
     };
-    /**
-     * This function takes in the text of a command and returns some command metadata used for functional
-     * tasks later on. Counts number of distinct mentioned users and whether or not a user wants to mention themself
-     * @param commandText Text to be looked through
-     */
     CommandController.prototype.commandParser = function (commandText) {
         var mentionsUser = commandText.includes(mentionSelfRef);
         var numMentions = 0;
@@ -339,39 +173,6 @@ var CommandController = /** @class */ (function (_super) {
             }
         }
         return { cNumMentions: numMentions, cMentionsUser: mentionsUser };
-    };
-    /**
-     * This function takes in a request, response, and user object, and does the bulk of building the command object.
-     * Once built, it is returned to the appropriate route.
-     * @param req Client Request
-     * @param res Server Response
-     * @param user Logged-in user
-     */
-    CommandController.prototype.commandBuilder = function (req, res, user) {
-        return __awaiter(this, void 0, void 0, function () {
-            var meme, commandData, commandFields, newCommand;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.memeRepo.findOneBy({ memeID: req.body.memeID })];
-                    case 1:
-                        meme = _a.sent();
-                        if (!meme) {
-                            return [2 /*return*/, this.exitWithMessage(res, AController_1.AController.STATUS_CODES.ITEM_NOT_FOUND, "Meme with ID ".concat(req.body.memeID, " not found."))];
-                        }
-                        commandData = req.body.cText ? this.commandParser(req.body.cText) : { cNumMentions: 0, cMentionsUser: false };
-                        commandFields = {
-                            cName: req.body.cName,
-                            cText: req.body.cText,
-                            cMentionsUser: commandData.cMentionsUser,
-                            cNumMentions: commandData.cNumMentions
-                        };
-                        newCommand = Object.assign(new Command_1.Command(), commandFields);
-                        newCommand.meme = meme;
-                        newCommand.cCreator = user;
-                        return [2 /*return*/, newCommand];
-                }
-            });
-        });
     };
     __decorate([
         (0, routing_controllers_1.Get)('/commands/'),

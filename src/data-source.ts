@@ -1,6 +1,3 @@
-/**
- * @author Tass Suderman, Levi Krozser
- */
 import 'reflect-metadata'
 import { DataSource } from 'typeorm'
 import { Meme } from './entity/Meme'

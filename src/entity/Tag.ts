@@ -1,9 +1,5 @@
-/**
- * @author Tass Suderman, Levi Krozser
- * @purpose Tag entity for CWEB280FinalProject
- */
 import { Entity, Unique, PrimaryColumn, ManyToMany } from 'typeorm'
-import { IsAlphanumeric, IsOptional, Length } from 'class-validator'
+import { IsAlphanumeric, Length } from 'class-validator'
 import { Meme } from './Meme'
 
 const TAG_NAME_MIN: number = 1

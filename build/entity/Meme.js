@@ -22,7 +22,7 @@ var DESC_MIN = 1;
 var DESC_MAX = 64;
 var DESC_LENGTH_ERROR = 'Meme description must be from $constraint1 to $constraint2 characters';
 // https://stackoverflow.com/questions/4098415/use-regex-to-get-image-url-in-html-js
-var IMAGE_LENGTH_MIN = 5;
+var IMAGE_LENGTH_MIN = 8;
 var IMAGE_LENGTH_MAX = 512;
 var IMAGE_LENGTH_ERR = 'Image route path must be from $constraint1 to $constraint2 characters';
 var IMAGE_REGEX = /(http)?s?:?(\/\/[^"']*\.(?:jpg|jpeg|gif|png|svg))/;
