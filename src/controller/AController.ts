@@ -36,7 +36,7 @@ export abstract class AController {
       field: ''
     }
     sortOptions.field = this.SORT_FIELDS.includes(req.query.sortby as string) ? req.query.sortby : this.SORT_FIELDS[0]
-    sortOptions.order = AController.DESCENDING_OPTIONS.includes((req.query.sortorder as string)?.toUpperCase()) // if broky look here
+    sortOptions.order = AController.DESCENDING_OPTIONS.includes((req.query.sortorder as string)?.toUpperCase())
       ? AController.DESCENDING
       : AController.ASCENDING
     return sortOptions
