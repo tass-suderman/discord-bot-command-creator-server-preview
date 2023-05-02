@@ -15,10 +15,8 @@ const port: number = 3030
 const ROUTE_NOT_FOUND_ERR: string = 'Route not found'
 const ROUTE_NOT_FOUND: any = { code: AController.STATUS_CODES.ITEM_NOT_FOUND.code, message: ROUTE_NOT_FOUND_ERR }
 
-// CORS options
-// TODO assess CORS origin URL
 const corsOptions = {
-  origin: /localhost:\d{4,5}$/i,
+  origin: /^.*tass-suderman\.ca\/.*/i,
   credentials: true,
   allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization',
   methods: 'GET,PUT,POST,DELETE'
